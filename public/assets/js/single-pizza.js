@@ -1,21 +1,21 @@
 const $backBtn = document.querySelector('#back-btn');
-const $pizzaName = document.querySelector('#pizza-name');
+const $userName = document.querySelector('#user-name');
 const $createdBy = document.querySelector('#created-by');
 const $createdAt = document.querySelector('#created-at');
 const $size = document.querySelector('#size');
 const $toppingsList = document.querySelector('#toppings-list');
-const $commentSection = document.querySelector('#comment-section');
-const $newCommentForm = document.querySelector('#new-comment-form');
+const $thoughtSection = document.querySelector('#thought-section');
+const $newThoughtForm = document.querySelector('#new-thought-form');
 
-let pizzaId;
+let userId;
 
-function getPizza() {
-  // get id of pizza
+function getUser() {
+  // get id of user
   const searchParams = new URLSearchParams(document.location.search.substring(1));
-  const pizzaId = searchParams.get('id');
+  const userId = searchParams.get('id');
 
-  // get pizzaInfo
-  fetch(`/api/pizzas/${pizzaId}`)
+  // get userInfo
+  fetch(`/api/users/${userId}`)
     .then(response => {
       console.log(response);
       if (!response.ok) {
@@ -25,22 +25,22 @@ function getPizza() {
 
       return response.json();
     })
-    .then(printPizza)
+    .then(printUser)
     .catch(err => {
       console.log(err);
-      alert('Cannot find a pizza with this id! Taking you back.');
+      alert('Cannot find a user with this id! Taking you back.');
       window.history.back();
     });
 }
 
-function printPizza(pizzaData) {
-  console.log(pizzaData);
+function printUser(userData) {
+  console.log(userData);
 
-  pizzaId = pizzaData._id;
+  userId = userData._id;
 
-  const { pizzaName, createdBy, createdAt, size, toppings, comments } = pizzaData;
+  const { userName, createdBy, createdAt, size, toppings, thoughts } = userData;
 
-  $pizzaName.textContent = pizzaName;
+  $userName.textContent = userName;
   $createdBy.textContent = createdBy;
   $createdAt.textContent = createdAt;
   $size.textContent = size;
@@ -48,71 +48,69 @@ function printPizza(pizzaData) {
     .map(topping => `<span class="col-auto m-2 text-center btn">${topping}</span>`)
     .join('');
 
-  if (comments && comments.length) {
-    comments.forEach(printComment);
+  if (thoughts && thoughts.length) {
+    thoughts.forEach(printThought);
   } else {
-    $commentSection.innerHTML = '<h4 class="bg-dark p-3 rounded">No comments yet!</h4>';
+    $thoughtSection.innerHTML = '<h4 class="bg-dark p-3 rounded">No thoughts yet!</h4>';
   }
 }
 
-function printComment(comment) {
-  // make div to hold comment and subcomments
-  const commentDiv = document.createElement('div');
-  commentDiv.classList.add('my-2', 'card', 'p-2', 'w-100', 'text-dark', 'rounded');
+function printThought(thought) {
+  // make div to hold thought and subthoughts
+  const thoughtDiv = document.createElement('div');
+  thoughtDiv.classList.add('my-2', 'card', 'p-2', 'w-100', 'text-dark', 'rounded');
 
-  const commentContent = `
-      <h5 class="text-dark">${comment.writtenBy} commented on ${comment.createdAt}:</h5>
-      <p>${comment.commentBody}</p>
+  const thoughtContent = `
+      <h5 class="text-dark">${thought.writtenBy} thoughted on ${thought.createdAt}:</h5>
+      <p>${thought.thoughtBody}</p>
       <div class="bg-dark ml-3 p-2 rounded" >
-        ${
-          comment.replies && comment.replies.length
-            ? `<h5>${comment.replies.length} ${
-                comment.replies.length === 1 ? 'Reply' : 'Replies'
-              }</h5>
-        ${comment.replies.map(printReply).join('')}`
-            : '<h5 class="p-1">No replies yet!</h5>'
-        }
+        ${thought.replies && thought.replies.length
+      ? `<h5>${thought.replies.length} ${thought.replies.length === 1 ? 'Reaction' : 'Replies'
+      }</h5>
+        ${thought.replies.map(printReaction).join('')}`
+      : '<h5 class="p-1">No replies yet!</h5>'
+    }
       </div>
-      <form class="reply-form mt-3" data-commentid='${comment._id}'>
+      <form class="reaction-form mt-3" data-thoughtid='${thought._id}'>
         <div class="mb-3">
-          <label for="reply-name">Leave Your Name</label>
-          <input class="form-input" name="reply-name" required />
+          <label for="reaction-name">Leave Your Name</label>
+          <input class="form-input" name="reaction-name" required />
         </div>
         <div class="mb-3">
-          <label for="reply">Leave a Reply</label>
-          <textarea class="form-textarea form-input"  name="reply" required></textarea>
+          <label for="reaction">Leave a Reaction</label>
+          <textarea class="form-textarea form-input"  name="reaction" required></textarea>
         </div>
 
-        <button class="mt-2 btn display-block w-100">Add Reply</button>
+        <button class="mt-2 btn display-block w-100">Add Reaction</button>
       </form>
   `;
 
-  commentDiv.innerHTML = commentContent;
-  $commentSection.prepend(commentDiv);
+  thoughtDiv.innerHTML = thoughtContent;
+  $thoughtSection.prepend(thoughtDiv);
 }
 
-function printReply(reply) {
+function printReaction(reaction) {
   return `
   <div class="card p-2 rounded bg-secondary">
-    <p>${reply.writtenBy} replied on ${reply.createdAt}:</p>
-    <p>${reply.replyBody}</p>
+    <p>${reaction.writtenBy} replied on ${reaction.createdAt}:</p>
+    <p>${reaction.reactionBody}</p>
   </div>
 `;
 }
 
-function handleNewCommentSubmit(event) {
+function handleNewThoughtSubmit(event) {
   event.preventDefault();
 
-  const commentBody = $newCommentForm.querySelector('#comment').value;
-  const writtenBy = $newCommentForm.querySelector('#written-by').value;
+  const thoughtBody = $newThoughtForm.querySelector('#thought').value;
+  const writtenBy = $newThoughtForm.querySelector('#written-by').value;
 
-  if (!commentBody || !writtenBy) {
+  if (!thoughtBody || !writtenBy) {
     return false;
   }
 
-  const formData = { commentBody, writtenBy };
+  const formData = { thoughtBody, writtenBy };
 
-  fetch(`/api/comments/${pizzaId}`, {
+  fetch(`/api/thoughts/${userId}`, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -126,8 +124,8 @@ function handleNewCommentSubmit(event) {
       }
       response.json();
     })
-    .then(commentResponse => {
-      console.log(commentResponse);
+    .then(thoughtResponse => {
+      console.log(thoughtResponse);
       // location.reload();
     })
     .catch(err => {
@@ -135,25 +133,25 @@ function handleNewCommentSubmit(event) {
     });
 }
 
-function handleNewReplySubmit(event) {
+function handleNewReactionSubmit(event) {
   event.preventDefault();
 
-  if (!event.target.matches('.reply-form')) {
+  if (!event.target.matches('.reaction-form')) {
     return false;
   }
 
-  const commentId = event.target.getAttribute('data-commentid');
+  const thoughtId = event.target.getAttribute('data-thoughtid');
 
-  const writtenBy = event.target.querySelector('[name=reply-name]').value;
-  const replyBody = event.target.querySelector('[name=reply]').value;
+  const writtenBy = event.target.querySelector('[name=reaction-name]').value;
+  const reactionBody = event.target.querySelector('[name=reaction]').value;
 
-  if (!replyBody || !writtenBy) {
+  if (!reactionBody || !writtenBy) {
     return false;
   }
 
-  const formData = { writtenBy, replyBody };
+  const formData = { writtenBy, reactionBody };
 
-  fetch(`/api/comments/${pizzaId}/${commentId}`, {
+  fetch(`/api/thoughts/${userId}/${thoughtId}`, {
     method: 'PUT',
     headers: {
       Accept: 'application/json',
@@ -167,8 +165,8 @@ function handleNewReplySubmit(event) {
       }
       response.json();
     })
-    .then(commentResponse => {
-      console.log(commentResponse);
+    .then(thoughtResponse => {
+      console.log(thoughtResponse);
       location.reload();
     })
     .catch(err => {
@@ -176,11 +174,11 @@ function handleNewReplySubmit(event) {
     });
 }
 
-$backBtn.addEventListener('click', function() {
+$backBtn.addEventListener('click', function () {
   window.history.back();
 });
 
-$newCommentForm.addEventListener('submit', handleNewCommentSubmit);
-$commentSection.addEventListener('submit', handleNewReplySubmit);
+$newThoughtForm.addEventListener('submit', handleNewThoughtSubmit);
+$thoughtSection.addEventListener('submit', handleNewReactionSubmit);
 
-getPizza();
+getUser();

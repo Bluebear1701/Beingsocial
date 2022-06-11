@@ -7,10 +7,10 @@ const ThoughtSchema = new Schema(
     thoughtText: {
       type: String,
       required: true,
-      maxlength:280,
-      minlength:1,
+      maxlength: 280,
+      minlength: 1,
     },
-       createdAt: {
+    createdAt: {
       type: Date,
       default: Date.now,
       get: createdAtVal => dateFormat(createdAtVal)
@@ -19,8 +19,8 @@ const ThoughtSchema = new Schema(
       type: String,
       required: true,
     }
-    // use ReplySchema to validate data for a reply
-    replies: [ReplySchema]
+    // use ReactionSchema to validate data for a reaction
+    replies: [ReactionSchema]
   },
   {
     toJSON: {
@@ -31,7 +31,7 @@ const ThoughtSchema = new Schema(
   }
 );
 
-ThoughtSchema.virtual('reactionCount').get(function() {
+ThoughtSchema.virtual('reactionCount').get(function () {
   return this.reactions.length;
 });
 

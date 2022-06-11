@@ -1,5 +1,5 @@
 const $addToppingBtn = document.querySelector('#add-topping');
-const $pizzaForm = document.querySelector('#pizza-form');
+const $userForm = document.querySelector('#user-form');
 const $customToppingsList = document.querySelector('#custom-toppings-list');
 
 const handleAddTopping = event => {
@@ -36,23 +36,23 @@ const handleAddTopping = event => {
   toppingValue.value = '';
 };
 
-const handlePizzaSubmit = event => {
+const handleUserSubmit = event => {
   event.preventDefault();
 
-  const pizzaName = $pizzaForm.querySelector('#pizza-name').value;
-  const createdBy = $pizzaForm.querySelector('#created-by').value;
-  const size = $pizzaForm.querySelector('#pizza-size').value;
-  const toppings = [...$pizzaForm.querySelectorAll('[name=topping]:checked')].map(topping => {
+  const userName = $userForm.querySelector('#user-name').value;
+  const createdBy = $userForm.querySelector('#created-by').value;
+  const size = $userForm.querySelector('#user-size').value;
+  const toppings = [...$userForm.querySelectorAll('[name=topping]:checked')].map(topping => {
     return topping.value;
   });
 
-  if (!pizzaName || !createdBy || !toppings.length) {
+  if (!userName || !createdBy || !toppings.length) {
     return;
   }
 
-  const formData = { pizzaName, createdBy, size, toppings };
+  const formData = { userName, createdBy, size, toppings };
 
-  fetch('/api/pizzas', {
+  fetch('/api/users', {
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -71,5 +71,5 @@ const handlePizzaSubmit = event => {
     });
 };
 
-$pizzaForm.addEventListener('submit', handlePizzaSubmit);
+$userForm.addEventListener('submit', handleUserSubmit);
 $addToppingBtn.addEventListener('click', handleAddTopping);

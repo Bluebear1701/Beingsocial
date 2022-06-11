@@ -14,8 +14,8 @@ const UserSchema = new Schema(
       unique: true
       required: true,
       match: /.+\@.+\..+/,
-    },    
-   
+    },
+
     thoughts: [
       {
         type: Schema.Types.ObjectId,
@@ -40,10 +40,10 @@ const UserSchema = new Schema(
   }
 );
 
-// get total count of comments and replies on retrieval
-UserSchema.virtual('friendCount').get(function() {
-  return this.friends.length 
-  
+// get total count of thoughts and replies on retrieval
+UserSchema.virtual('friendCount').get(function () {
+  return this.friends.length
+
 });
 
 const User = model('User', UserSchema);

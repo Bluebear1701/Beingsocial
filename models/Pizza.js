@@ -1,9 +1,9 @@
 const { Schema, model } = require('mongoose');
 const dateFormat = require('../utils/dateFormat');
 
-const PizzaSchema = new Schema(
+const UserSchema = new Schema(
   {
-    pizzaName: {
+    userName: {
       type: String,
       required: true,
       trim: true
@@ -25,10 +25,10 @@ const PizzaSchema = new Schema(
       default: 'Large'
     },
     toppings: [],
-    comments: [
+    thoughts: [
       {
         type: Schema.Types.ObjectId,
-        ref: 'Comment'
+        ref: 'Thought'
       }
     ]
   },
@@ -42,14 +42,14 @@ const PizzaSchema = new Schema(
   }
 );
 
-// get total count of comments and replies on retrieval
-PizzaSchema.virtual('commentCount').get(function() {
-  return this.comments.reduce(
-    (total, comment) => total + comment.replies.length + 1,
+// get total count of thoughts and replies on retrieval
+UserSchema.virtual('thoughtCount').get(function () {
+  return this.thoughts.reduce(
+    (total, thought) => total + thought.replies.length + 1,
     0
   );
 });
 
-const Pizza = model('Pizza', PizzaSchema);
+const User = model('User', UserSchema);
 
-module.exports = Pizza;
+module.exports = User;
